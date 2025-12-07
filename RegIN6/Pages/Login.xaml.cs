@@ -231,5 +231,34 @@ namespace RegIN6.Pages
                 CountSetPassword = 2;
             });
         }
+        private void SetLogin(object sender, KeyEventArgs e)
+        {
+            // При нажатии на кнопку Enter
+            if (e.Key == Key.Enter)
+            {
+                // Вызываем метод получения данных пользователя по логину
+                MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
+
+                // Если пароль пользователя введён
+                if (TbPassword.Password.Length > 0)
+                    // Вызываем метод ввода пароля
+                    SetPassword();
+            }
+        }
+
+        /// <summary>
+        /// Ввод логина пользователя
+        /// </summary>
+        private void SetLogin(object sender, RoutedEventArgs e)
+        {
+            // Если с текстового поля снято выделение
+            // Вызываем метод получения данных пользователя по логину
+            MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
+
+            // Если пароль пользователя введён
+            if (TbPassword.Password.Length > 0)
+                // Вызываем метод ввода пароля
+                SetPassword();
+        }
     }
 }
