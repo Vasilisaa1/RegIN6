@@ -260,5 +260,13 @@ namespace RegIN6.Pages
                 // Вызываем метод ввода пароля
                 SetPassword();
         }
+        public void SetNotification(string Message, SolidColorBrush _Color)
+        {
+            // Для текстового поля указываем текст
+            LNameUser.Content = Message;
+            // Для текстового поля указываем цвет
+            LNameUser.Foreground = _Color;
+        }
+
     }
 }
