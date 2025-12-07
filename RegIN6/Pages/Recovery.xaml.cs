@@ -28,6 +28,12 @@ namespace RegIN6.Pages
         public Recovery()
         {
             InitializeComponent();
+
+
+            MainWindow.mainWindow.UserLogIn.HandlerCorrectLogin += CorrectLogin;
+            MainWindow.mainWindow.UserLogIn.HandlerInCorrectLogin += InCorrectLogin;
+
+            Capture.HandlerCorrectCapture += CorrectCapture;
         }
         private void CorrectLogin()
         {
@@ -145,6 +151,61 @@ namespace RegIN6.Pages
             IsCapture = true;
             // Вызываем генерацию нового пароля
             SendNewPassword();
+        }
+        private void SetLogin(object sender, KeyEventArgs e)
+        {
+            // Если нажата клавиша Enter
+            if (e.Key == Key.Enter)
+                // Вызываем получение данных пользователя по логину
+                MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
+        }
+
+        /// <summary>
+        /// Метод ввода логина
+        /// </summary>
+        private void SetLogin(object sender, RoutedEventArgs e) =>
+            // Вызываем получение данных пользователя по логину
+            MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
+        public void SendNewPassword()
+        {
+            // Если пройдена капча
+            if (IsCapture)
+            {
+                // Если пароль не является пустым, а это значит пользователь ввёл правильную почту
+                if (MainWindow.mainWindow.UserLogIn.Password != String.Empty)
+                {
+                    // Создаём анимацию старта
+                    DoubleAnimation StartAnimation = new DoubleAnimation();
+                    // Указываем значение от которого она выполняется
+                    StartAnimation.From = 1;
+                    // Указываем значение до которого она выполняется
+                    StartAnimation.To = 0;
+                    // Указываем продолжительность выполнения
+                    StartAnimation.Duration = TimeSpan.FromSeconds(0.6);
+                    // Присваиваем событие при конце анимации
+                    StartAnimation.Completed += delegate
+                    {
+                        // Указываем стандартный логотип в качестве изображения пользователя
+                        IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/ic-mail.png"));
+                        // Создаём анимацию конца
+                        DoubleAnimation EndAnimation = new DoubleAnimation();
+                        // Указываем значение от которого она выполняется
+                        EndAnimation.From = 0;
+                        // Указываем значение до которого она выполняется
+                        EndAnimation.To = 1;
+                        // Указываем продолжительность выполнения
+                        EndAnimation.Duration = TimeSpan.FromSeconds(1.2);
+                        // Запускаем анимацию плавной смены на изображении
+                        IUser.BeginAnimation(OpacityProperty, EndAnimation);
+                    };
+                    // Запускаем анимацию плавной смены на изображении
+                    IUser.BeginAnimation(OpacityProperty, StartAnimation);
+                    // Выводим сообщение о том что новый пароль будет отправлен на почту
+                    SetNotification("An email has been sent to your email.", Brushes.Black);
+                    // Вызываем функцию создания нового пароля
+                    MainWindow.mainWindow.UserLogIn.CrateNewPassword();
+                }
+            }
         }
     }
 }
