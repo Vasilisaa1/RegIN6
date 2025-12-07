@@ -15,6 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using RegIN6.Classes;
 
 namespace RegIN6.Pages
 {
@@ -113,6 +114,62 @@ namespace RegIN6.Pages
         {
             Capture.IsEnabled = false;
             IsCapture = true;
+        }
+        private void SetPassword(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SetPassword();
+            }
+        }
+        public void SetPassword()
+        {
+            // Если пароль пользователя загруженного из БД не пустой
+            // Значит что пользователь ввёл правильный логин
+            if (MainWindow.mainWindow.UserLogIn.Password != String.Empty)
+            {
+                // Если капча пройдена
+                if (IsCapture)
+                {
+                    // Если пароль загруженного пользователя совпадает с паролем введённым в поле
+                    if (MainWindow.mainWindow.UserLogIn.Password == TbPassword.Password)
+                    {
+                        // Перенаправляем пользователя на страницу подтверждения
+                        // Сообщаем странице, что проходим подтверждение на авторизацию
+                        MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
+                    }
+                    else
+                    {
+                        // Если пароль не совпадает с загруженным пользователя
+                        if (CountSetPassword > 0)
+                        {
+                            // Выводим предупреждение, сколько попыток осталось, цвет = красный
+                            SetNotification($"Password is incornect, {CountSetPassword} attempts left", Brushes.Red);
+
+
+                            // Вычитаем попытку ввода пароля  
+                            CountSetPassword--;
+                        }
+                    }
+                }
+                else
+                {
+                    // Если попытки ввода пароля закончились  
+                    // Создаём поток  
+                    Thread TBlockAutorization = new Thread(BlockAutorization);
+                    // Запускаем поток  
+                    TBlockAutorization.Start();
+
+                    // Отправляем сообщение пользователю о том, что под его аккаунтом кто-то пытается авторизоваться  
+                    SendMail.SendMessage("An attempt was made to log into your account.", MainWindow.mainWindow.UserLogIn.Login);
+                }
+                
+            }
+            else
+            {
+                // Если капча не пройдена, вызываем ошибку, цвет - красный  
+                SetNotification($"Enter capture", Brushes.Red);
+            }
         }
     }
 }
