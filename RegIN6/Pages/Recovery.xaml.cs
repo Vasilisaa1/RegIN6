@@ -207,5 +207,9 @@ namespace RegIN6.Pages
                 }
             }
         }
+        private void OpenLogin(object sender, MouseButtonEventArgs e)
+        {
+            MainWindow.mainWindow.OpenPage(new Login());
+        }
     }
 }
