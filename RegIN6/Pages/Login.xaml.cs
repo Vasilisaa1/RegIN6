@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -267,6 +268,9 @@ namespace RegIN6.Pages
             // Для текстового поля указываем цвет
             LNameUser.Foreground = _Color;
         }
-
+        private void RecoveryPassword(object sender, MouseButtonEventArgs e) =>
+    MainWindow.mainWindow.OpenPage(new Recovery());
+        private void OpenRegin(object sender, MouseButtonEventArgs e) =>
+    MainWindow.mainWindow.OpenPage(new Regin());
     }
 }
