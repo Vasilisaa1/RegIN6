@@ -86,7 +86,7 @@ namespace RegIN6.Pages
         }
         private void OpenLogin(object sender, MouseButtonEventArgs e)
         {
-            MainWindow.mainWindow.OpenPage(new Login());
+            MainWindow.mainWindow.OpenPage(new Login( ));
         }
 
         private void SetCode()
