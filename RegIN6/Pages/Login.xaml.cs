@@ -171,5 +171,65 @@ namespace RegIN6.Pages
                 SetNotification($"Enter capture", Brushes.Red);
             }
         }
+        public void BlockAutorization()
+        {
+            // Запоминаем время блокировки
+            DateTime StartBlock = DateTime.Now.AddMinutes(3);
+            // Выполняем вне потока
+            Dispatcher.Invoke(() =>
+            {
+                // Отключаем окно ввода логина
+                TbLogin.IsEnabled = false;
+                // Отключаем окно ввода пароля
+                TbPassword.IsEnabled = false;
+                // Отключаем окно ввода капчи
+                Capture.IsEnabled = false;
+            });
+
+            // Запускаем цикл в 180 шагов | 180/60 = 3 минуты
+            for (int i = 0; i < 180; i++)
+            {
+                // получаем оставшееся время
+                TimeSpan TimeIdle = StartBlock.Subtract(DateTime.Now);
+                // Получаем минуты
+                string s_minutes = TimeIdle.Minutes.ToString();
+                // Если минуты меньше 10
+                if (TimeIdle.Minutes < 10)
+                    // Добавляем 0
+                    s_minutes = "0" + TimeIdle.Minutes;
+                // Получаем секунды
+                string s_seconds = TimeIdle.Seconds.ToString();
+                // Если секунды меньше 10
+                if (TimeIdle.Seconds < 10)
+                    // Добавляем 0
+                    s_seconds = "0" + TimeIdle.Seconds;
+                // Вне потока
+                Dispatcher.Invoke(() =>
+                {
+                    // Выводим время до разблокировки, цвет красный
+                    SetNotification($"Reauthorization available in: {s_minutes}:{s_seconds}", Brushes.Red);
+                });
+                // Ждём 1 секунду
+                Thread.Sleep(1000);
+            }
+            // Вне потока
+            Dispatcher.Invoke(() =>
+            {
+                // Выводим логин авторизованного пользователя, цвет чёрный
+                SetNotification("Hi, " + MainWindow.mainWindow.UserLogIn.Name, Brushes.Black);
+                // Включаем ввод логина
+                TbLogin.IsEnabled = true;
+                // Включаем ввод пароля
+                TbPassword.IsEnabled = true;
+                // Включаем капчу
+                Capture.IsEnabled = true;
+                // Вызываем генерацию новой капчи
+                Capture.CreateCapture();
+                // Запоминаем о том что капча не введена
+                IsCapture = false;
+                // Устанавливаем кол-во попыток 2
+                CountSetPassword = 2;
+            });
+        }
     }
 }
