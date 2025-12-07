@@ -137,5 +137,14 @@ namespace RegIN6.Pages
                 // Выводим сообщение о том, что логин введён не верно, цвет текста красный
                 SetNotification("Login is incorrect", Brushes.Red);
         }
+        private void CorrectCapture()
+        {
+            // Отключаем элемент капчи
+            Capture.IsEnabled = false;
+            // Запоминаем что ввод капчи осуществлён
+            IsCapture = true;
+            // Вызываем генерацию нового пароля
+            SendNewPassword();
+        }
     }
 }
