@@ -35,13 +35,6 @@
                     VerticalAlignment="Top"
                     Width="100"
                     Source="/Images/users.jpg">
-
-                    <Image.Clip>
-                        <EllipseGeometry
-                            RadiusX="50"
-                            RadiusY="50"
-                            Center="50, 50"/>
-                    </Image.Clip>
                 </Image>
                 <Label
                     x:Name="LNameUser"

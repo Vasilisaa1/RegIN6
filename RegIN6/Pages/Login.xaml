@@ -21,11 +21,12 @@
     <Grid>
         <materialDesign:Card
 
-        Height="400"
+        Height="450"
         VerticalAlignment="Center"
         HorizontalAlignment="Center"
         Width="300">
             <Grid>
+                
                 <Image
                 x:Name="IUser"
                 HorizontalAlignment="Center"
@@ -34,12 +35,7 @@
                 VerticalAlignment="Top"
                 Width="100"
                 Source="/RegIN;component/Images/ic-user.png">
-                    <Image.Clip>
-                        <EllipseGeometry
-                        RadiusX="50"
-                        RadiusY="50"
-                        Center="50, 50" />
-                    </Image.Clip>
+                  
                 </Image>
                 <Label
                 x:Name="LNameUser"
@@ -85,6 +81,14 @@
                 MouseDown="RecoveryPassword"
                 HorizontalAlignment="Left"
                 Width="110"/>
+                <Button x:Name="BtnQuickLogin"
+        Content="Быстрый вход"
+        Width="150"
+        Height="35"
+        Margin="75,400,75,0"
+        VerticalAlignment="Top"
+        Click="BtnQuickLogin_Click"
+        Visibility="Collapsed"/>
                 <Label
                 Content="Registration"
                 Margin="0,373,10,0"

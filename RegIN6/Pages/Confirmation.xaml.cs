@@ -71,7 +71,7 @@ namespace RegIN6.Pages
 
         private void SetCode()
         {
-           if (TbCode.Text == Code.ToString() && TbCode.IsEnabled == true)
+            if (TbCode.Text == Code.ToString() && TbCode.IsEnabled == true)
             {
                 TbCode.IsEnabled = false;
 
@@ -79,12 +79,54 @@ namespace RegIN6.Pages
                 {
                     MessageBox.Show("Авторизация пользователя успешно подтверждена.");
 
-                }
+                    if (MainWindow.mainWindow.UserLogIn.HasPin)
+                    {
+                        var result = MessageBox.Show("Использовать быстрый вход по PIN-коду в следующий раз?",
+                            "Быстрая авторизация", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-                else
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            MessageBox.Show("PIN-код уже установлен. При следующем входе используйте быстрый вход.",
+                                "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                            // MainWindow.mainWindow.OpenPage(new MainPage());
+                        }
+                        else
+                        {
+                            MainWindow.mainWindow.OpenPage(new Login());
+                        }
+                    }
+                    else
+                    {
+                        var result = MessageBox.Show("Хотите установить 4-значный PIN-код для быстрой авторизации?",
+                            "Настройка PIN", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Setup));
+                        }
+                        else
+                        {
+                            MainWindow.mainWindow.OpenPage(new Login());
+                        }
+                    }
+                }
+                else 
                 {
                     MainWindow.mainWindow.UserLogIn.SetUser();
                     MessageBox.Show("Регистрация пользователя успешно подтверждена.");
+
+                    var result = MessageBox.Show("Хотите установить 4-значный PIN-код для быстрой авторизации?",
+                        "Настройка PIN", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Setup));
+                    }
+                    else
+                    {
+                        MainWindow.mainWindow.OpenPage(new Login());
+                    }
                 }
             }
         }

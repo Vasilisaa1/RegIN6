@@ -40,7 +40,6 @@ namespace RegIN6.Pages
         {
             if (OldLogin != TbLogin.Text)
             {
-
                 SetNotification("Hi, " + MainWindow.mainWindow.UserLogIn.Name, Brushes.Black);
 
                 try
@@ -76,11 +75,21 @@ namespace RegIN6.Pages
 
                 OldLogin = TbLogin.Text;
 
+                BtnQuickLogin.Visibility = MainWindow.mainWindow.UserLogIn.HasPin
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
+        private void BtnQuickLogin_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainWindow.mainWindow.UserLogIn.HasPin)
+            {
+                MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Login));
             }
         }
         public void InCorrectLogin()
         {
-            // Если пользователь идентифицирован как личность, или указаны ошибки
             if (LNameUser.Content != "")
             {
               
@@ -132,26 +141,38 @@ namespace RegIN6.Pages
                 {
                     if (MainWindow.mainWindow.UserLogIn.Password == TbPassword.Password)
                     {
-                        MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
+                        if (MainWindow.mainWindow.UserLogIn.HasPin)
+                        {
+                            var result = MessageBox.Show("Использовать быстрый вход по PIN-коду?",
+                                "Быстрая авторизация", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Login));
+                            }
+                            else
+                            { 
+                                MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
+                            }
+                        }
+                        else
+                        {
+                            MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
+                        }
                     }
                     else
                     {
                         if (CountSetPassword > 0)
                         {
                             SetNotification($"Password is incornect, {CountSetPassword} attempts left", Brushes.Red);
-
-
                             CountSetPassword--;
                         }
                     }
                 }
                 else
                 {
-                    Thread TBlockAutorization = new Thread(BlockAutorization);
-                    TBlockAutorization.Start();
-                     SendMail.SendMessage("An attempt was made to log into your account.", MainWindow.mainWindow.UserLogIn.Login);
+                    SetNotification($"Enter capture", Brushes.Red);
                 }
-                
             }
             else
             {

@@ -9,14 +9,17 @@ namespace RegIN6.Classes
 {
     public class User
     {
-
         public int Id { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
         public byte[] Image = new byte[0];
+        public string PinCode { get; set; } // Добавили поле для PIN
         public DateTime DateUpdate { get; set; }
         public DateTime DateCreate { get; set; }
+
+        public bool HasPin => !string.IsNullOrEmpty(PinCode); // Свойство для проверки наличия PIN
+
         public CorrectLogin HandlerCorrectLogin;
         public InCorrectLogin HandlerInCorrectLogin;
 
@@ -30,6 +33,7 @@ namespace RegIN6.Classes
             this.Password = String.Empty;
             this.Name = String.Empty;
             this.Image = new byte[0];
+            this.PinCode = String.Empty; // Инициализируем
 
             MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
 
@@ -54,6 +58,12 @@ namespace RegIN6.Classes
                     this.DateUpdate = userQuery.GetDateTime(5);
                     this.DateCreate = userQuery.GetDateTime(6);
 
+                    // Получаем PIN-код, если есть (7-й столбец)
+                    if (!userQuery.IsDBNull(7))
+                    {
+                        this.PinCode = userQuery.GetString(7);
+                    }
+
                     HandlerCorrectLogin.Invoke();
                 }
                 else
@@ -75,7 +85,8 @@ namespace RegIN6.Classes
 
             if (WorkingDB.OpenConnection(mySqlConnection))
             {
-                MySqlCommand mySqlCommand = new MySqlCommand("INSERT INTO users (Login, Password, Name, Image, DateUpdate, DateCreate) VALUES (@Login, @Password, @Name, @Image, @DateUpdate, @DateCreate)", mySqlConnection);
+                // Обновляем запрос, чтобы включить PinCode
+                MySqlCommand mySqlCommand = new MySqlCommand("INSERT INTO users (Login, Password, Name, Image, DateUpdate, DateCreate, PinCode) VALUES (@Login, @Password, @Name, @Image, @DateUpdate, @DateCreate, @PinCode)", mySqlConnection);
 
                 mySqlCommand.Parameters.AddWithValue("@Login", this.Login);
                 mySqlCommand.Parameters.AddWithValue("@Password", this.Password);
@@ -83,6 +94,7 @@ namespace RegIN6.Classes
                 mySqlCommand.Parameters.AddWithValue("@Image", this.Image);
                 mySqlCommand.Parameters.AddWithValue("@DateUpdate", this.DateUpdate);
                 mySqlCommand.Parameters.AddWithValue("@DateCreate", this.DateCreate);
+                mySqlCommand.Parameters.AddWithValue("@PinCode", this.PinCode ?? (object)DBNull.Value);
 
                 mySqlCommand.ExecuteNonQuery();
             }
@@ -90,6 +102,47 @@ namespace RegIN6.Classes
             WorkingDB.CloseConnection(mySqlConnection);
         }
 
+        // Метод для установки PIN-кода
+        public void SetPin(string pin)
+        {
+            if (!string.IsNullOrEmpty(this.Login) && pin.Length == 4 && int.TryParse(pin, out _))
+            {
+                MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
+
+                if (WorkingDB.OpenConnection(mySqlConnection))
+                {
+                    WorkingDB.Query($"UPDATE users SET PinCode='{pin}' WHERE Login = '{this.Login}'", mySqlConnection);
+                    this.PinCode = pin; // Обновляем локально
+                }
+
+                WorkingDB.CloseConnection(mySqlConnection);
+            }
+        }
+
+        // Метод для проверки PIN-кода
+        public bool CheckPin(string pin)
+        {
+            return !string.IsNullOrEmpty(this.PinCode) && this.PinCode == pin;
+        }
+
+        // Метод для удаления PIN-кода
+        public void RemovePin()
+        {
+            if (!string.IsNullOrEmpty(this.Login))
+            {
+                MySqlConnection mySqlConnection = WorkingDB.OpenConnection();
+
+                if (WorkingDB.OpenConnection(mySqlConnection))
+                {
+                    WorkingDB.Query($"UPDATE users SET PinCode=NULL WHERE Login = '{this.Login}'", mySqlConnection);
+                    this.PinCode = null; // Обновляем локально
+                }
+
+                WorkingDB.CloseConnection(mySqlConnection);
+            }
+        }
+
+        // Остальные методы без изменений
         public void CrateNewPassword()
         {
             if (Login != String.Empty)
@@ -108,6 +161,7 @@ namespace RegIN6.Classes
                 SendMail.SendMessage($"Your account password has been changed.\nNew password: {this.Password}", this.Login);
             }
         }
+
         public string GeneratePass()
         {
             List<Char> NewPassword = new List<char>();
