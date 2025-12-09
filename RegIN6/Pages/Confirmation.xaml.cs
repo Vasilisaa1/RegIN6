@@ -50,7 +50,7 @@ namespace RegIN6.Pages
             // Инициализируем процесс в потоке для отправки повторного письма
             Thread TSendMailCode = new Thread(TimerSendMailCode);
             // Отправляем письмо
-            TSendMailCode.Start();
+            //TSendMailCode.Start();
         }
         public void TimerSendMailCode()
         {
@@ -79,11 +79,7 @@ namespace RegIN6.Pages
         {
             SendMailCode();
         }
-        private void SetCode(object sender, KeyEventArgs e)
-        {
-            if (TbCode.Text.Length == 6)
-                SetCode();
-        }
+
         private void OpenLogin(object sender, MouseButtonEventArgs e)
         {
             MainWindow.mainWindow.OpenPage(new Login( ));
@@ -91,7 +87,7 @@ namespace RegIN6.Pages
 
         private void SetCode()
         {
-            if (TbCode.Text == Code.ToString() && TbCode.IsEnabled == true)
+           if (TbCode.Text == Code.ToString() && TbCode.IsEnabled == true)
             {
                 TbCode.IsEnabled = false;
 
@@ -107,6 +103,12 @@ namespace RegIN6.Pages
                     MessageBox.Show("Регистрация пользователя успешно подтверждена.");
                 }
             }
+        }
+
+        private void SetCode(object sender, KeyEventArgs e)
+        {
+            if (TbCode.Text.Length == 6)
+                SetCode();
         }
     }
 }

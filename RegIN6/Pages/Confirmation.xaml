@@ -50,8 +50,7 @@
                   TextWrapping="Wrap"
                   Text=""
                   VerticalAlignment="Top"
-                  KeyUp="SetCode"
-                  LostFocus="SetCode"/>
+                  KeyUp="SetCode"/>
                 <Label
                   x:Name="LTimer"
                   Content=""

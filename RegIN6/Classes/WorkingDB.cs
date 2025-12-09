@@ -13,7 +13,7 @@ namespace RegIN6.Classes
         /// <summary>
         /// Строка подключения к базе данных, указывается сервер, порт подключения, база данных, имя пользователя, пароль пользователя
         /// </summary>
-        readonly static string connection = "server=localhost;port=3306;database=regin;user=root;pwd=root;";
+        readonly static string connection = "server=localhost;port=3306;database=regin;user=root;";
         /// <summary>
         /// Создание и открытие подключения
         /// </summary>

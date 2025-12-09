@@ -25,14 +25,14 @@ namespace RegIN6.Classes
                 Port = 587,
 
                 // Указываем почту, с которой будет отправляться сообщение,и пароль от этой почты
-                Credentials = new NetworkCredential("yandex@yandex.ru", "yrijjwkptgfqgzqd"),
+                Credentials = new NetworkCredential("veber.vasilisa2006@yandex.ru", "togjvzmpwymyycyq"),
 
                 // Включаем поддержку SSL
                 EnableSsl = true,
             };
 
             // Вызываем метод send, который отправляет письмо на указанный адрес
-            smtpClient.Send("landaxer@yandex.ru", To, "Проект RegIn", Message);
+            smtpClient.Send("veber.vasilisa2006@yandex.ru", To, "Проект RegIn", Message);
         }
 
     }

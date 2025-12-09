@@ -95,7 +95,7 @@ namespace RegIN6.Pages
  
                 StartAnimation.Completed += delegate
                 {
-                    IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/ic-user.png"));
+                    IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/user.png"));
 
                     DoubleAnimation EndAnimation = new DoubleAnimation();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using MySql.Data.MySqlClient;
 using Imaging = Aspose.Imaging;
 
 namespace RegIN6.Pages
@@ -61,7 +63,7 @@ namespace RegIN6.Pages
         public void SetLogin()
         {
            
-            Regex regex = new Regex(@"([a-zA-Z0-9._-]{4,}[a-zA-Z0-9._-]{2,}\.[a-zA-Z0-9_-]{2,})");
+            Regex regex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
          
             BCorrectLogin = regex.IsMatch(TbLogin.Text);
             
@@ -162,8 +164,9 @@ namespace RegIN6.Pages
             MainWindow.mainWindow.UserLogIn.Login = TbLogin.Text;
             MainWindow.mainWindow.UserLogIn.Password = TbPassword.Password;
             MainWindow.mainWindow.UserLogIn.Name = TbName.Text;
-            if (BSetImage)
-                MainWindow.mainWindow.UserLogIn.Image = File.ReadAllBytes(Directory.GetCurrentDirectory() + @"\User.jpg");
+            if (BSetImage){
+                MainWindow.mainWindow.UserLogIn.Image = File.ReadAllBytes(FileDialogImage.FileName);
+            }
         
             MainWindow.mainWindow.UserLogIn.DateUpdate = DateTime.Now;
          
@@ -171,6 +174,31 @@ namespace RegIN6.Pages
        
             MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Regin));
         }
+        //пример
+
+        public static void SaveImageToDatabase(string imagePath, int recordId)
+        {
+            string connectionString = "server=localhost;port=3306;database=regin;user=root;"; // Замените на свою
+            byte[] imageData = File.ReadAllBytes(imagePath); // 1. Читаем файл в байты
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE users SET Image = @Image WHERE Id = @Id"; // или INSERT
+
+                using (MySqlCommand command = new MySqlCommand(sql, connection))
+                {
+                    // 2. Добавляем параметр
+                    command.Parameters.Add("@Image", MySqlDbType.VarBinary, -1).Value = imageData;
+                    command.Parameters.Add("@Id", MySqlDbType.Int32).Value = recordId;
+
+                    // 3. Выполняем запрос
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        //-----------
         private void SetName(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !Char.IsLetter(e.Text, 0);
@@ -199,10 +227,10 @@ namespace RegIN6.Pages
                         NewHeight = (int)(image.Height * (256f / image.Width));
                     }
                     image.Resize(NewWidht, NewHeight);
-                    image.Save("IUsers.jpg");
+                    image.Save("IUsers" + MainWindow.mainWindow.UserLogIn.Id + ".jpg");
                 }
             }
-            using (Imaging.RasterImage rasterImage = (Imaging.RasterImage)Imaging.Image.Load("IUsers.jpg"))
+            using (Imaging.RasterImage rasterImage = (Imaging.RasterImage)Imaging.Image.Load("IUsers" + MainWindow.mainWindow.UserLogIn.Id + ".jpg"))
             {
                 if (!rasterImage.IsCached)
                 {
@@ -248,6 +276,11 @@ namespace RegIN6.Pages
         private void OpenLogin(object sender, MouseButtonEventArgs e)
         {
             MainWindow.mainWindow.OpenPage(new Login());
+        }
+
+        private void OpenRegin(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

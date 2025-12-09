@@ -122,7 +122,7 @@ namespace RegIN6.Pages
                 StartAnimation.Completed += delegate
                 {
                     // Указываем стандартный логотип в качестве изображения пользователя
-                    IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/ic-user.png"));
+                    IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/user.png"));
                     // Создаём анимацию конца
                     DoubleAnimation EndAnimation = new DoubleAnimation();
                     // Указываем значение от которого она выполняется
@@ -186,7 +186,7 @@ namespace RegIN6.Pages
                     StartAnimation.Completed += delegate
                     {
                         // Указываем стандартный логотип в качестве изображения пользователя
-                        IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/ic-mail.png"));
+                        IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/gmail.png"));
                         // Создаём анимацию конца
                         DoubleAnimation EndAnimation = new DoubleAnimation();
                         // Указываем значение от которого она выполняется
