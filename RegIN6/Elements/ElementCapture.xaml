@@ -8,20 +8,16 @@
               d:DesignWidth="280"
   d:DesignHeight="100">
     <Grid>
-
-        <!-- Элемент GRID. Является основным контейнером для случайных цифр -->
         <Grid
         x:Name="Capture"
         Height="50"
         VerticalAlignment="Top"/>
 
-        <!-- Элемент LABLE  -->
         <Label
         Content="Enter capture:"
         Margin="0,50,0,0"
         VerticalAlignment="Top"/>
 
-        <!-- Элемент TEXTBOX. Является полем для ввода капчи -->
         <TextBox
         x:Name="InputCapture"
         HorizontalContentAlignment="Center"

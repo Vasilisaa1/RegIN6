@@ -25,7 +25,7 @@ namespace RegIN6.Elements
         string StrCapture = "";
         int ElementWidth = 280;
         int ElementHeight = 50;
-
+        Random ThisRandom = new Random();
         public ElementCapture()
         {
             InitializeComponent();
@@ -37,45 +37,39 @@ namespace RegIN6.Elements
             InputCapture.Text = "";
             Capture.Children.Clear();
             StrCapture = "";
-            CreateBackground();
-            Background();
-        }
 
-        void CreateBackground()
-        {
-            Random ThisRandom = new Random();
             for (int i = 0; i < 100; i++)
             {
-                int back = ThisRandom.Next(0, 10);
-                Label LBackground = new Label()
+                Label Lbackground = new Label()
                 {
-                    Content = back,
+                    Content = ThisRandom.Next(0, 10),
                     FontSize = ThisRandom.Next(10, 16),
                     FontWeight = FontWeights.Bold,
                     Foreground = new SolidColorBrush(Color.FromArgb(100, (byte)ThisRandom.Next(0, 255), (byte)ThisRandom.Next(0, 255), (byte)ThisRandom.Next(0, 255))),
                     Margin = new Thickness(ThisRandom.Next(0, ElementWidth - 20), ThisRandom.Next(0, ElementHeight - 20), 0, 0)
                 };
-                Capture.Children.Add(LBackground);
+                Capture.Children.Add(Lbackground);
             }
-        }
 
-        void Background()
-        {
-            Random ThisRandom = new Random();
             for (int i = 0; i < 4; i++)
             {
-                int back = ThisRandom.Next(0, 10);
-                Label Code = new Label()
+                char c = (char)('0' + ThisRandom.Next(0, 10));
+                StrCapture += c;
+
+                Label lCode = new Label()
                 {
-                    Content = back,
+                    Content = c,
                     FontSize = 30,
                     FontWeight = FontWeights.Bold,
-                    Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)ThisRandom.Next(0, 255), (byte)ThisRandom.Next(0, 255), (byte)ThisRandom.Next(0, 255))),
+                    Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)ThisRandom.Next(0, 255),
+                    (byte)ThisRandom.Next(0, 255), (byte)ThisRandom.Next(0, 255))),
                     Margin = new Thickness(ElementWidth / 2 - 60 + i * 30, ThisRandom.Next(-10, 10), 0, 0)
                 };
-                StrCapture += back.ToString();
-                Capture.Children.Add(Code);
+
+                Capture.Children.Add(lCode);
             }
+
+            InputCapture.Focus();
         }
 
         public bool OnCapture()

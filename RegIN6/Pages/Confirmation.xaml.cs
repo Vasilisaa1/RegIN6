@@ -16,9 +16,6 @@ using System.Windows.Shapes;
 
 namespace RegIN6.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для Confirmation.xaml
-    /// </summary>
     public partial class Confirmation : Page
     {
         public enum TypeConfirmation
@@ -41,37 +38,24 @@ namespace RegIN6.Pages
         }
         public void SendMailCode()
         {
-            // Генерируем случайное число
             Code = new Random().Next(100000, 999999);
-
-            // Отправляем число на почту авторизуемого пользователя
             Classes.SendMail.SendMessage($"Login code: {Code}", MainWindow.mainWindow.UserLogIn.Login);
-
-            // Инициализируем процесс в потоке для отправки повторного письма
             Thread TSendMailCode = new Thread(TimerSendMailCode);
-            // Отправляем письмо
             TSendMailCode.Start();
         }
         public void TimerSendMailCode()
         {
-            // Запускаем цикл в 60 шагов
             for (int i = 0; i < 60; i++)
             {
-                // Выполняем вне потока
                 Dispatcher.Invoke(() =>
                 {
-                    // Изменяем данные на текстовом поле
                     LTimer.Content = $"A second message can be sent after {(60 - i)} seconds";
                 });
-                // Ждём 1 секунду
                 Thread.Sleep(1000);
             }
-            // По истечению таймера вне потока
             Dispatcher.Invoke(() =>
             {
-                // Включаем кнопку отправить повторно
                 BSendMessage.IsEnabled = true;
-                // Изменяем данные на текстовом поле
                 LTimer.Content = "";
             });
         }

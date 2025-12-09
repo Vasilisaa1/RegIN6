@@ -174,31 +174,7 @@ namespace RegIN6.Pages
        
             MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Regin));
         }
-        //пример
-
-        public static void SaveImageToDatabase(string imagePath, int recordId)
-        {
-            string connectionString = "server=localhost;port=3306;database=regin;user=root;"; // Замените на свою
-            byte[] imageData = File.ReadAllBytes(imagePath); // 1. Читаем файл в байты
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                string sql = "UPDATE users SET Image = @Image WHERE Id = @Id"; // или INSERT
-
-                using (MySqlCommand command = new MySqlCommand(sql, connection))
-                {
-                    // 2. Добавляем параметр
-                    command.Parameters.Add("@Image", MySqlDbType.VarBinary, -1).Value = imageData;
-                    command.Parameters.Add("@Id", MySqlDbType.Int32).Value = recordId;
-
-                    // 3. Выполняем запрос
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        //-----------
+      
         private void SetName(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !Char.IsLetter(e.Text, 0);

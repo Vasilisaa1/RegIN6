@@ -30,6 +30,7 @@ namespace RegIN6.Pages
         bool IsCapture = false;
         public Login()
         {
+
             InitializeComponent();
             MainWindow.mainWindow.UserLogIn.HandlerCorrectLogin += CorrectLogin;
             MainWindow.mainWindow.UserLogIn.HandlerInCorrectLogin += InCorrectLogin;
@@ -125,147 +126,96 @@ namespace RegIN6.Pages
         }
         public void SetPassword()
         {
-            // Если пароль пользователя загруженного из БД не пустой
-            // Значит что пользователь ввёл правильный логин
             if (MainWindow.mainWindow.UserLogIn.Password != String.Empty)
             {
-                // Если капча пройдена
                 if (IsCapture)
                 {
-                    // Если пароль загруженного пользователя совпадает с паролем введённым в поле
                     if (MainWindow.mainWindow.UserLogIn.Password == TbPassword.Password)
                     {
-                        // Перенаправляем пользователя на страницу подтверждения
-                        // Сообщаем странице, что проходим подтверждение на авторизацию
                         MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
                     }
                     else
                     {
-                        // Если пароль не совпадает с загруженным пользователя
                         if (CountSetPassword > 0)
                         {
-                            // Выводим предупреждение, сколько попыток осталось, цвет = красный
                             SetNotification($"Password is incornect, {CountSetPassword} attempts left", Brushes.Red);
 
 
-                            // Вычитаем попытку ввода пароля  
                             CountSetPassword--;
                         }
                     }
                 }
                 else
                 {
-                    // Если попытки ввода пароля закончились  
-                    // Создаём поток  
                     Thread TBlockAutorization = new Thread(BlockAutorization);
-                    // Запускаем поток  
                     TBlockAutorization.Start();
-
-                    // Отправляем сообщение пользователю о том, что под его аккаунтом кто-то пытается авторизоваться  
-                    SendMail.SendMessage("An attempt was made to log into your account.", MainWindow.mainWindow.UserLogIn.Login);
+                     SendMail.SendMessage("An attempt was made to log into your account.", MainWindow.mainWindow.UserLogIn.Login);
                 }
                 
             }
             else
             {
-                // Если капча не пройдена, вызываем ошибку, цвет - красный  
                 SetNotification($"Enter capture", Brushes.Red);
             }
         }
         public void BlockAutorization()
         {
-            // Запоминаем время блокировки
             DateTime StartBlock = DateTime.Now.AddMinutes(3);
-            // Выполняем вне потока
             Dispatcher.Invoke(() =>
             {
-                // Отключаем окно ввода логина
                 TbLogin.IsEnabled = false;
-                // Отключаем окно ввода пароля
                 TbPassword.IsEnabled = false;
-                // Отключаем окно ввода капчи
-                Capture.IsEnabled = false;
+               Capture.IsEnabled = false;
             });
 
-            // Запускаем цикл в 180 шагов | 180/60 = 3 минуты
-            for (int i = 0; i < 180; i++)
+             for (int i = 0; i < 180; i++)
             {
-                // получаем оставшееся время
-                TimeSpan TimeIdle = StartBlock.Subtract(DateTime.Now);
-                // Получаем минуты
+                 TimeSpan TimeIdle = StartBlock.Subtract(DateTime.Now);
                 string s_minutes = TimeIdle.Minutes.ToString();
-                // Если минуты меньше 10
                 if (TimeIdle.Minutes < 10)
-                    // Добавляем 0
                     s_minutes = "0" + TimeIdle.Minutes;
-                // Получаем секунды
                 string s_seconds = TimeIdle.Seconds.ToString();
-                // Если секунды меньше 10
                 if (TimeIdle.Seconds < 10)
-                    // Добавляем 0
                     s_seconds = "0" + TimeIdle.Seconds;
-                // Вне потока
                 Dispatcher.Invoke(() =>
                 {
-                    // Выводим время до разблокировки, цвет красный
-                    SetNotification($"Reauthorization available in: {s_minutes}:{s_seconds}", Brushes.Red);
+                     SetNotification($"Reauthorization available in: {s_minutes}:{s_seconds}", Brushes.Red);
                 });
-                // Ждём 1 секунду
-                Thread.Sleep(1000);
+                 Thread.Sleep(1000);
             }
-            // Вне потока
             Dispatcher.Invoke(() =>
             {
-                // Выводим логин авторизованного пользователя, цвет чёрный
-                SetNotification("Hi, " + MainWindow.mainWindow.UserLogIn.Name, Brushes.Black);
-                // Включаем ввод логина
+                  SetNotification("Hi, " + MainWindow.mainWindow.UserLogIn.Name, Brushes.Black);
                 TbLogin.IsEnabled = true;
-                // Включаем ввод пароля
                 TbPassword.IsEnabled = true;
-                // Включаем капчу
                 Capture.IsEnabled = true;
-                // Вызываем генерацию новой капчи
                 Capture.CreateCapture();
-                // Запоминаем о том что капча не введена
                 IsCapture = false;
-                // Устанавливаем кол-во попыток 2
                 CountSetPassword = 2;
             });
         }
         private void SetLogin(object sender, KeyEventArgs e)
         {
-            // При нажатии на кнопку Enter
             if (e.Key == Key.Enter)
             {
-                // Вызываем метод получения данных пользователя по логину
-                MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
+                 MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
 
-                // Если пароль пользователя введён
                 if (TbPassword.Password.Length > 0)
-                    // Вызываем метод ввода пароля
-                    SetPassword();
+                     SetPassword();
             }
         }
 
-        /// <summary>
-        /// Ввод логина пользователя
-        /// </summary>
+  
         private void SetLogin(object sender, RoutedEventArgs e)
         {
-            // Если с текстового поля снято выделение
-            // Вызываем метод получения данных пользователя по логину
             MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
 
-            // Если пароль пользователя введён
             if (TbPassword.Password.Length > 0)
-                // Вызываем метод ввода пароля
                 SetPassword();
         }
         public void SetNotification(string Message, SolidColorBrush _Color)
         {
-            // Для текстового поля указываем текст
-            LNameUser.Content = Message;
-            // Для текстового поля указываем цвет
+             LNameUser.Content = Message;
             LNameUser.Foreground = _Color;
         }
         private void RecoveryPassword(object sender, MouseButtonEventArgs e) =>
