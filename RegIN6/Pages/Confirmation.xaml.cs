@@ -50,7 +50,7 @@ namespace RegIN6.Pages
             // Инициализируем процесс в потоке для отправки повторного письма
             Thread TSendMailCode = new Thread(TimerSendMailCode);
             // Отправляем письмо
-            //TSendMailCode.Start();
+            TSendMailCode.Start();
         }
         public void TimerSendMailCode()
         {
