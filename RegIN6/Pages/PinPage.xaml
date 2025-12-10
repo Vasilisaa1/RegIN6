@@ -34,7 +34,7 @@
 
                 <Label
                     x:Name="LTitle"
-                    Content="Введите PIN-код"
+                    Content="Введите Пинкод"
                     HorizontalAlignment="Center"
                     Margin="0,130,0,0"
                     VerticalAlignment="Top"
@@ -42,7 +42,7 @@
                     FontWeight="Bold"/>
 
                 <Label
-                    Content="PIN-код (4 цифры):"
+                    Content="Пинкод:"
                     Margin="20,170,20,0"
                     VerticalAlignment="Top"/>
 
@@ -66,20 +66,22 @@
                     Height="25"/>
 
                 <Button
+                    Background="Black"
                     x:Name="BtnAction"
                     Content="Продолжить"
-                    Width="150"
-                    Height="35"
-                    HorizontalAlignment="Center"
-                    Margin="0,265,0,0"
+                    Width="80"
+                    FontSize="8"
+                    Height="20"
+                    HorizontalAlignment="Left"
+                    Margin="220,305,0,0"
                     VerticalAlignment="Top"
                     Click="BtnAction_Click"/>
 
                 <Label
                     Content="Назад"
-                    Margin="20,305,20,0"
+                    Margin="20,305,254,0"
                     VerticalAlignment="Top"
-                    Foreground="#FF673AB7"
+                    Foreground="Black"
                     FontSize="10"
                     MouseDown="OpenLogin"/>
             </Grid>
