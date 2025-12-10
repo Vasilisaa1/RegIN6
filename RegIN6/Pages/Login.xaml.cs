@@ -28,14 +28,15 @@ namespace RegIN6.Pages
         string OldLogin;
         int CountSetPassword = 2;
         bool IsCapture = false;
+
         public Login()
         {
-
             InitializeComponent();
             MainWindow.mainWindow.UserLogIn.HandlerCorrectLogin += CorrectLogin;
             MainWindow.mainWindow.UserLogIn.HandlerInCorrectLogin += InCorrectLogin;
             Capture.HandlerCorrectCapture += CorrectCapture;
         }
+
         public void CorrectLogin()
         {
             if (OldLogin != TbLogin.Text)
@@ -75,34 +76,33 @@ namespace RegIN6.Pages
 
                 OldLogin = TbLogin.Text;
 
-                BtnQuickLogin.Visibility = MainWindow.mainWindow.UserLogIn.HasPin
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
+                // ПОКАЗЫВАЕМ КНОПКУ БЫСТРОГО ВХОДА, ЕСЛИ ЕСТЬ PIN
+                if (MainWindow.mainWindow.UserLogIn.HasPin)
+                {
+                    BtnQuickLogin.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    BtnQuickLogin.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
-        private void BtnQuickLogin_Click(object sender, RoutedEventArgs e)
-        {
-            if (MainWindow.mainWindow.UserLogIn.HasPin)
-            {
-                MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Login));
-            }
-        }
         public void InCorrectLogin()
         {
+            // Если пользователь идентифицирован как личность, или указаны ошибки
             if (LNameUser.Content != "")
             {
-              
                 LNameUser.Content = "";
-    
+
                 DoubleAnimation StartAnimation = new DoubleAnimation();
-        
+
                 StartAnimation.From = 1;
- 
+
                 StartAnimation.To = 0;
-    
+
                 StartAnimation.Duration = TimeSpan.FromSeconds(0.6);
- 
+
                 StartAnimation.Completed += delegate
                 {
                     IUser.Source = new BitmapImage(new Uri("pack://application:,,,/Images/user.png"));
@@ -110,7 +110,7 @@ namespace RegIN6.Pages
                     DoubleAnimation EndAnimation = new DoubleAnimation();
 
                     EndAnimation.From = 0;
- 
+
                     EndAnimation.To = 1;
 
                     EndAnimation.Duration = TimeSpan.FromSeconds(1.2);
@@ -120,12 +120,17 @@ namespace RegIN6.Pages
             }
             if (TbLogin.Text.Length > 0)
                 SetNotification("Login is incorrect", Brushes.Red);
+
+            // Скрываем кнопку быстрого входа при неверном логине
+            BtnQuickLogin.Visibility = Visibility.Collapsed;
         }
+
         public void CorrectCapture()
         {
             Capture.IsEnabled = false;
             IsCapture = true;
         }
+
         private void SetPassword(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -133,6 +138,7 @@ namespace RegIN6.Pages
                 SetPassword();
             }
         }
+
         public void SetPassword()
         {
             if (MainWindow.mainWindow.UserLogIn.Password != String.Empty)
@@ -141,8 +147,10 @@ namespace RegIN6.Pages
                 {
                     if (MainWindow.mainWindow.UserLogIn.Password == TbPassword.Password)
                     {
+                        // ПРОВЕРЯЕМ, ЕСТЬ ЛИ У ПОЛЬЗОВАТЕЛЯ PIN
                         if (MainWindow.mainWindow.UserLogIn.HasPin)
                         {
+                            // ЕСТЬ PIN - ПРЕДЛАГАЕМ БЫСТРЫЙ ВХОД
                             var result = MessageBox.Show("Использовать быстрый вход по PIN-коду?",
                                 "Быстрая авторизация", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -151,12 +159,14 @@ namespace RegIN6.Pages
                                 MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Login));
                             }
                             else
-                            { 
+                            {
+                                // ИДЕМ НА ПОДТВЕРЖДЕНИЕ ЧЕРЕЗ ПОЧТУ
                                 MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
                             }
                         }
                         else
                         {
+                            // НЕТ PIN - ИДЕМ НА ПОДТВЕРЖДЕНИЕ ЧЕРЕЗ ПОЧТУ
                             MainWindow.mainWindow.OpenPage(new Confirmation(Confirmation.TypeConfirmation.Login));
                         }
                     }
@@ -171,7 +181,9 @@ namespace RegIN6.Pages
                 }
                 else
                 {
-                    SetNotification($"Enter capture", Brushes.Red);
+                    Thread TBlockAutorization = new Thread(BlockAutorization);
+                    TBlockAutorization.Start();
+                    SendMail.SendMessage("An attempt was made to log into your account.", MainWindow.mainWindow.UserLogIn.Login);
                 }
             }
             else
@@ -179,6 +191,21 @@ namespace RegIN6.Pages
                 SetNotification($"Enter capture", Brushes.Red);
             }
         }
+
+        // НОВЫЙ МЕТОД ДЛЯ КНОПКИ БЫСТРОГО ВХОДА
+        private void BtnQuickLogin_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainWindow.mainWindow.UserLogIn.HasPin)
+            {
+                MainWindow.mainWindow.OpenPage(new PinPage(PinPage.PinMode.Login));
+            }
+            else
+            {
+                MessageBox.Show("У вас не установлен PIN-код. Сначала войдите обычным способом.",
+                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
         public void BlockAutorization()
         {
             DateTime StartBlock = DateTime.Now.AddMinutes(3);
@@ -186,12 +213,13 @@ namespace RegIN6.Pages
             {
                 TbLogin.IsEnabled = false;
                 TbPassword.IsEnabled = false;
-               Capture.IsEnabled = false;
+                Capture.IsEnabled = false;
+                BtnQuickLogin.IsEnabled = false; // Отключаем кнопку тоже
             });
 
-             for (int i = 0; i < 180; i++)
+            for (int i = 0; i < 180; i++)
             {
-                 TimeSpan TimeIdle = StartBlock.Subtract(DateTime.Now);
+                TimeSpan TimeIdle = StartBlock.Subtract(DateTime.Now);
                 string s_minutes = TimeIdle.Minutes.ToString();
                 if (TimeIdle.Minutes < 10)
                     s_minutes = "0" + TimeIdle.Minutes;
@@ -200,33 +228,34 @@ namespace RegIN6.Pages
                     s_seconds = "0" + TimeIdle.Seconds;
                 Dispatcher.Invoke(() =>
                 {
-                     SetNotification($"Reauthorization available in: {s_minutes}:{s_seconds}", Brushes.Red);
+                    SetNotification($"Reauthorization available in: {s_minutes}:{s_seconds}", Brushes.Red);
                 });
-                 Thread.Sleep(1000);
+                Thread.Sleep(1000);
             }
             Dispatcher.Invoke(() =>
             {
-                  SetNotification("Hi, " + MainWindow.mainWindow.UserLogIn.Name, Brushes.Black);
+                SetNotification("Hi, " + MainWindow.mainWindow.UserLogIn.Name, Brushes.Black);
                 TbLogin.IsEnabled = true;
                 TbPassword.IsEnabled = true;
                 Capture.IsEnabled = true;
                 Capture.CreateCapture();
                 IsCapture = false;
                 CountSetPassword = 2;
+                BtnQuickLogin.IsEnabled = true; // Включаем кнопку обратно
             });
         }
+
         private void SetLogin(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                 MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
+                MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
 
                 if (TbPassword.Password.Length > 0)
-                     SetPassword();
+                    SetPassword();
             }
         }
 
-  
         private void SetLogin(object sender, RoutedEventArgs e)
         {
             MainWindow.mainWindow.UserLogIn.GetUserLogin(TbLogin.Text);
@@ -234,14 +263,17 @@ namespace RegIN6.Pages
             if (TbPassword.Password.Length > 0)
                 SetPassword();
         }
+
         public void SetNotification(string Message, SolidColorBrush _Color)
         {
-             LNameUser.Content = Message;
+            LNameUser.Content = Message;
             LNameUser.Foreground = _Color;
         }
+
         private void RecoveryPassword(object sender, MouseButtonEventArgs e) =>
-    MainWindow.mainWindow.OpenPage(new Recovery());
+            MainWindow.mainWindow.OpenPage(new Recovery());
+
         private void OpenRegin(object sender, MouseButtonEventArgs e) =>
-    MainWindow.mainWindow.OpenPage(new Regin());
+            MainWindow.mainWindow.OpenPage(new Regin());
     }
 }
