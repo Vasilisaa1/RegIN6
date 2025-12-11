@@ -37,7 +37,7 @@ namespace RegIN6.Pages
             MainWindow.mainWindow.UserLogIn.HandlerCorrectLogin += CorrectLogin;
             MainWindow.mainWindow.UserLogIn.HandlerInCorrectLogin += InCorrectLogin;
 
-            FileDialogImage.Filter = "PNG (*.png)|*.png|JPG (*.jpg)|*.jpg";
+            FileDialogImage.Filter = "JPG (*.jpg)|*.jpg";
             FileDialogImage.RestoreDirectory = true;
             FileDialogImage.Title = "Choose a phoro for your avatar";
         }
@@ -186,6 +186,7 @@ namespace RegIN6.Pages
         }
         private void SelectImage(object sender, MouseButtonEventArgs e)
         {
+
             if (FileDialogImage.ShowDialog() == true)
             {
                 using (Imaging.Image image = Imaging.Image.Load(FileDialogImage.FileName))
@@ -228,8 +229,7 @@ namespace RegIN6.Pages
 
                 Imaging.Rectangle rectangle = new Imaging.Rectangle(X, Y, Width, Height);
                 rasterImage.Crop(rectangle);
-
-                rasterImage.Save("IUsers.jpg");
+                rasterImage.Save("IUsers" + MainWindow.mainWindow.UserLogIn.Id + ".jpg");
 
                 DoubleAnimation StartAnimation = new DoubleAnimation();
                 StartAnimation.From = 1;
@@ -237,7 +237,7 @@ namespace RegIN6.Pages
                 StartAnimation.Duration = TimeSpan.FromSeconds(0.6);
                 StartAnimation.Completed += delegate
                 {
-                    IUser.Source = new BitmapImage(new Uri(Directory.GetCurrentDirectory() + @"\IUsers.jpg"));
+                    IUser.Source = new BitmapImage(new Uri(Directory.GetCurrentDirectory() + @"\IUsers" + MainWindow.mainWindow.UserLogIn.Id + ".jpg"));
                     DoubleAnimation EndAnimation = new DoubleAnimation();
                     EndAnimation.From = 0;
                     EndAnimation.To = 1;

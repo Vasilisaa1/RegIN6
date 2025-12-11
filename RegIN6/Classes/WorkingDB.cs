@@ -10,7 +10,7 @@ namespace RegIN6.Classes
 {
     public class WorkingDB
     {
-        readonly static string connection = "server=localhost;port=3306;database=regin;user=root;";
+        readonly static string connection = "server=localhost;port=3307;database=regin;user=root;";
         public static MySqlConnection OpenConnection()
         {
             try
